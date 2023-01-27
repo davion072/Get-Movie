@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.tt {
-  color: purple;
+.inputTexts {
+  @apply px-4 py-3 rounded-lg shadow-xl bg-gray-100 text-xl
 }

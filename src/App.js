@@ -1,32 +1,53 @@
 import Header from "./components/Header";
-import Items from "./components/Items";
+import MovieCard from "./components/MovieCard";
+import ModalContent from "./components/ModalContent";
 
 import { useState, useEffect } from "react";
 import axios from 'axios'
 
 
 function App() {
-  const [search, setSearch] = useState('cat');
-  const [results, setResults] = useState([])
-
+  const [search, setSearch] = useState({ movie: 'Kantara', year: 0, plot: '' });
+  const [results, setResults] = useState({})
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`https://pixabay.com/api/?key=33009969-0454b2b172a743a697263c617&q=${search}&image_type=photo&pretty=true`)
-      .then((res) => {
-        setResults(res.data.hits)
-      })
-      .catch(err => console.error(err))
-  }, [search]);
+      if(search.year) {
+        axios.get(`https://www.omdbapi.com/?t=${search.movie}&y=${search.year}&plot=full&apikey=d5629332`)
+          .then((res) => {
+            const data = res.data
+            setResults(data)
+            // console.log(data)
+          })
+          .catch(err => console.error(err))
+      } else {
+        axios.get(`https://www.omdbapi.com/?t=${search.movie}&plot=full&apikey=d5629332`)
+          .then((res) => {
+            const data = res.data
+            setResults(data)
+            // console.log(data)
+          })
+          .catch(err => console.error(err))
+      }
 
-  const getSearch = (text) => {
+    }, [search]);
+
+  const getSearchData = (text) => {
     setSearch(text);
-    console.log(search)
   }
+
+  const openHandler = () => setOpen(!open);
 
   return (
     <>
-      <Header onSearch={getSearch} />
-      <Items items={results} />
+      <div className={`${open ? "opacity-50" : ""}`}>
+        <Header onSearch={getSearchData} />
+        <MovieCard movie={results} open={openHandler} />
+      </div>
+      {open ?
+        <ModalContent movie={results} open={openHandler} />
+        : ""
+      }
     </>
   );
 }
